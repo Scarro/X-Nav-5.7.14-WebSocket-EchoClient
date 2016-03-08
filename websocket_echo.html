@@ -4,21 +4,34 @@
  <head>
   <meta charset="utf-8" />
   <title>WebSocket Test</title>
-  <script language="javascript" type="text/javascript">
+  <script>
 
   var wsUri = "ws://echo.websocket.org/";
-   var output;
+  var output;
 
-  function init() {
-   output = document.getElementById("output");
-   testWebSocket();
+  function dameTexto(){
+    var nodo = document.getElementById("output");
+    while(nodo.firstChild){
+      nodo.removeChild(nodo.firstChild);
+    }
+    var mensaje = document.getElementById("texto").value;
+    init(mensaje);
   }
 
- function testWebSocket() {
+  function init(mensaje) {
+    output = document.getElementById("output");
+    if(mensaje["isTrusted"]){
+      testWebSocket();
+    }else {
+      testWebSocket(mensaje);
+    }
+  }
+
+ function testWebSocket(mensaje) {
    websocket = new WebSocket(wsUri);
 
    websocket.onopen = function(evt) {
-     onOpen(evt)
+     onOpen(mensaje);
    };
 
    websocket.onclose = function(evt) {
@@ -33,17 +46,21 @@
    };
  }
 
-  function onOpen(evt) {
-   writeToScreen("CONNECTED");
-   doSend("WebSocket rocks");
+  function onOpen(mensaje) {
+   writeToScreen("CONECTADO");
+    if(mensaje){
+      doSend(mensaje);
+    }else{
+      doSend("WebSocket rocks");
+    }
   }
 
   function onClose(evt) {
-   writeToScreen("DISCONNECTED");
+   writeToScreen("DESCONECTADO");
   }  
 
   function onMessage(evt) {
-   writeToScreen('<span style="color: blue;">RESPONSE: ' + evt.data+'</span>');
+   writeToScreen('<span style="color: blue;">RESPUESTA: ' + evt.data+'</span>');
    websocket.close();
   }
 
@@ -52,7 +69,7 @@
   }
 
   function doSend(message) {
-   writeToScreen("SENT: " + message);
+   writeToScreen("ECHO DE: " + message);
    websocket.send(message);
   }
 
@@ -64,10 +81,15 @@
   }
 
   window.addEventListener("load", init, false);
+
   </script>
  </head>
  <body>
   <h2>WebSocket Test</h2>
+  <div>
+    <input id="texto" type="text" placeholder="Escriba algo"></input>
+    <button onclick="dameTexto()">Enviar</button>
+  </div>
   <div id="output"></div>
  </body>
 </html>
